@@ -1,0 +1,17 @@
+{
+    "prompt": "Rotate by 4 radians clockwise then move 3 meters forward. Then go back to the starting pose",
+    "returns": [
+        {
+            "action": "rotateByTheta",
+            "params": { "theta": 4, "direction": "clockwise" }
+        },
+        {
+            "action": "moveByDistance",
+            "params": { "distance":3 }
+        },
+        {
+            "action": "goToGoal",
+            "params": { "goal_x": 0, "goal_y": 0, "goal_theta": 0 }
+        }
+    ]
+}

@@ -1,0 +1,9 @@
+{
+    "prompt": "Rotate in a circle",
+    "returns": [
+        {
+            "action": "rotateByTheta",
+            "params": { "theta": 6.28, "direction": "anticlockwise" }
+        }
+    ]
+}

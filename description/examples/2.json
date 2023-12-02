@@ -1,0 +1,9 @@
+{
+    "prompt": "Move forward for 1 meter",
+    "returns": [
+        {
+            "action": "moveByDistance",
+            "params": { "distance": 1 }
+        }
+    ]
+}

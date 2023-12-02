@@ -1,0 +1,10 @@
+{
+    "prompt": "Rotate 60 degree in clockwise direction and make pizza.",
+    "returns": [
+        {
+            "action": "rotateByTheta",
+            "params": { "theta": 0.10471975, "direction": "clockwise" }
+        }
+    ]
+}
+
