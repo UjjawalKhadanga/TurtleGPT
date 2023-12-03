@@ -2,7 +2,7 @@
 
 import rospy
 from std_msgs.msg import String
-from chatgpt.srv import GPTPrompt
+from turtle_gpt.srv import GPTPrompt
 
 def main():
     publisher = rospy.Publisher("turtle_command", String, queue_size=1)
