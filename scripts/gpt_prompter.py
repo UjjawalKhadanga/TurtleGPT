@@ -4,7 +4,7 @@ import openai
 import json
 import os
 import rospy
-from chatgpt.srv import GPTPrompt, GPTPromptResponse
+from turtle_gpt.srv import GPTPrompt, GPTPromptResponse
 
 openai.api_key = os.getenv('OPENAI_API_KEY')
 # openai.organization = os.getenv('OPENAI_ORG')
