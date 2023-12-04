@@ -58,7 +58,7 @@ find_package(catkin REQUIRED COMPONENTS
 add_service_files(
   FILES
   GPTPrompt.srv
-  audioToText.srv
+  speechToText.srv
 )
 
 ## Generate actions in the 'action' folder
@@ -165,6 +165,7 @@ catkin_install_python(PROGRAMS
   scripts/main.py
   scripts/turtle_controller.py
   scripts/turtle_controller_closed_loop.py
+  scripts/speech_to_text.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
