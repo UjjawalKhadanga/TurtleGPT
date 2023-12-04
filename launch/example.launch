@@ -2,11 +2,11 @@
 <launch>
 
     <env name="OPENAI_API_KEY" value=""/>
-    <env name="DESCRIPTION_FOLDER_PATH" value="$(find chatgpt)/description"/>
+    <env name="DESCRIPTION_FOLDER_PATH" value="$(find turtle_gpt)/description"/>
 
-    <node name="gptPrompter" pkg="chatgpt" type="gpt_prompter.py" output="screen"/>
-    <node name="main" pkg="chatgpt" type="main.py" output="screen"/>
-    <node name="contoller" pkg="chatgpt" type="turtle_controller_closed_loop.py" output="screen"/>
+    <node name="gptPrompter" pkg="turtle_gpt" type="gpt_prompter.py" output="screen"/>
+    <node name="main" pkg="turtle_gpt" type="main.py" output="screen"/>
+    <node name="contoller" pkg="turtle_gpt" type="turtle_controller_closed_loop.py" output="screen"/>
     <node name="turtle" pkg="turtlesim" type="turtlesim_node" />
     <node name="stt" pkg="turtle_gpt" type="speech_to_text.py" output="screen"/>
 

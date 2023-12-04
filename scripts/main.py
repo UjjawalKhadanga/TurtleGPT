@@ -90,14 +90,15 @@ def handleCMD():
         rospy.wait_for_service('/GPTPrompt')
         GPTService = rospy.ServiceProxy('/GPTPrompt', GPTPrompt)
         res = GPTService(inp)
-
         result = String()
         result.data = res.response
+
+        # result = String()
         # result.data = '''[
-        #     {"action": "rotateByTheta", "params": { "theta": 2, "direction": "clockwise" }},
-        #     {"action": "moveByDistance", "params": { "distance" : 1 }},
-        #     {"action": "goToGoal", "params": { "goal_x" : 1, "goal_y": 1, "goal_theta": 1.57  }}
+        #     {"action": "goToGoal", "params": { "goal_x" : 1, "goal_y": 1, "goal_theta": 1.57  }},
+        #     {"action": "goToGoal", "params": { "goal_x" : 5, "goal_y": 9, "goal_theta": 2  }}
         # ]'''
+
         publisher.publish(result)
 
 def handleGUI():
