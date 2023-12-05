@@ -38,7 +38,7 @@ class TurtleController:
 		self.subTasks = rospy.Subscriber('/turtle_command', String, self.onTasks)
 		self.pose = Pose()
 		
-		self.anglePID = PID(3, 0, 1)
+		self.anglePID = PID(2.8, 0, 0)
 		self.distancePID = PID(1.4, 0, 0)
 
 		self.msg = Twist()
@@ -99,9 +99,9 @@ class TurtleController:
 			goal_theta = (self.pose.theta - float(args['theta']) + 2*math.pi)%(2*math.pi)
 		vel = Twist()
 		angle_distance = goal_theta - self.pose.theta
-		while abs(angle_distance) >= 0.005:
+		while abs(angle_distance) >= 0.01:
 			angle_distance = goal_theta - self.pose.theta
-			if args['direction'] == 'anticlockwise':
+			if angle_distance>0:
 				vel.angular.z = self.anglePID.update(abs(angle_distance))
 			else :
 				vel.angular.z = self.anglePID.update(-abs(angle_distance))
@@ -164,7 +164,7 @@ class TurtleController:
 		
 		# Angle correction
 		angle_err_final = (float(args['goal_theta']) - self.pose.theta + 2*math.pi)%(2*math.pi)
-		self.rotateByTheta({ 'theta': angle_err_final, 'direction': 'clockwise'})
+		self.rotateByTheta({ 'theta': angle_err_final, 'direction': 'anticlockwise'})
 
 		
 def main():

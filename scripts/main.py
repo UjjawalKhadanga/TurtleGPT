@@ -107,7 +107,7 @@ def handleGUI():
     root.mainloop()
 
 def main():     
-    type = input("Press (1) - for Speech to Text GUI, (2) - for commandline")
+    type = input("Press (1) - for commandline, (2) - for Speech to Text GUI, ")
     if type == '1':
         handleCMD()
     elif type == '2':
