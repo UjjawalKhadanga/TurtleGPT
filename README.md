@@ -13,25 +13,27 @@ TurtleGPT is a project aimed at revolutionizing human-robot interactions by seam
    ```
    into your ROS workspace.
 
-2. Install required dependencies:
+2. Download `vosk-model-small-en-us-0.15` from [alphacephei.com](https://alphacephei.com/vosk/models) and move it to the "models" folder within the repository.
+
+3. Install required dependencies:
    ```
    pip3 install -r requirements.txt
    ```
 
-3. Install the pyaudio dependency:
+4. Install the pyaudio dependency:
    ```
    sudo apt install python3-pyaudio
    ```
 
-4. Build the ROS workspace:
+5. Build the ROS workspace:
    ```
    cd <your_ros_workspace>
    catkin_make
    ```
 
-5. Add your OpenAI key to `./launch/example.launch` in the 'OPENAI_API_KEY' environment variable. Get an OpenAI key from [platform.openai.com](https://platform.openai.com/account/api-keys).
+6. Add your OpenAI key to `./launch/example.launch` in the 'OPENAI_API_KEY' environment variable. Get an OpenAI key from [platform.openai.com](https://platform.openai.com/account/api-keys).
 
-6. You're all set!
+7. You're all set!
 
 ### Running the Program
 
