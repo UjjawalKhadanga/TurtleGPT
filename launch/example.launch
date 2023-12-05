@@ -8,5 +8,6 @@
     <node name="main" pkg="turtle_gpt" type="main.py" output="screen"/>
     <node name="contoller" pkg="turtle_gpt" type="turtle_controller_closed_loop.py" output="screen"/>
     <node name="turtle" pkg="turtlesim" type="turtlesim_node" />
+    <node name="stt" pkg="turtle_gpt" type="speech_to_text.py" output="screen"/>
 
 </launch>

@@ -17,6 +17,12 @@ class PID:
         self.prev_error = 0.0
         self.integral = 0.0
         self.derivative = 0.0
+		
+    def reset(self):
+        self.error = 0.0
+        self.prev_error = 0.0
+        self.integral = 0.0
+        self.derivative = 0.0
     
     def update(self, error):
         self.error = error
@@ -32,10 +38,12 @@ class TurtleController:
 		self.subTasks = rospy.Subscriber('/turtle_command', String, self.onTasks)
 		self.pose = Pose()
 		
-		self.anglePID = PID(1, 0, 0)
-		self.distancePID = PID(1, 0, 0)
+		self.anglePID = PID(3, 0, 1)
+		self.distancePID = PID(1.4, 0, 0)
 
-	def onPose(self, data):
+		self.msg = Twist()
+
+	def onPose(self, data):                                                         
 		self.pose = data
 		if self.pose.theta < 0:
 			self.pose.theta += 2*math.pi
@@ -85,12 +93,18 @@ class TurtleController:
 		if 'direction' not in args :
 			args['direction'] = 'anticlockwise'
 		rospy.loginfo(f"Turtle Rotating by theta {args['theta']} {args['direction']}")
-		goal_theta = self.pose.theta + float(args['theta'])*math.pow(-1, args['direction']=='cloclwise')
+		if args['direction'] == 'anticlockwise':
+			goal_theta = (self.pose.theta + float(args['theta']) + 2*math.pi)%(2*math.pi)
+		else:
+			goal_theta = (self.pose.theta - float(args['theta']) + 2*math.pi)%(2*math.pi)
 		vel = Twist()
 		angle_distance = goal_theta - self.pose.theta
-		while abs(angle_distance) >= 0.05:
+		while abs(angle_distance) >= 0.005:
 			angle_distance = goal_theta - self.pose.theta
-			vel.angular.z = self.anglePID.update(angle_distance)
+			if args['direction'] == 'anticlockwise':
+				vel.angular.z = self.anglePID.update(abs(angle_distance))
+			else :
+				vel.angular.z = self.anglePID.update(-abs(angle_distance))
 			self.pub_cmd_vel.publish(vel)
 		vel.angular.z = 0
 		self.pub_cmd_vel.publish(vel)
@@ -101,7 +115,7 @@ class TurtleController:
 		goal_y = self.pose.y + float(args['distance']) * math.sin(self.pose.theta)
 		vel = Twist()
 		distance = math.sqrt(math.pow(goal_x - self.pose.x, 2) + math.pow(goal_y - self.pose.y, 2))
-		while abs(distance) >= 0.05:
+		while abs(distance) >= 0.005:
 			distance = math.sqrt(math.pow(goal_x - self.pose.x, 2) + math.pow(goal_y - self.pose.y, 2))
 			vel.linear.x = self.distancePID.update(distance)
 			self.pub_cmd_vel.publish(vel)
@@ -110,13 +124,48 @@ class TurtleController:
 
 	def goToGoal(self, args):
 		rospy.loginfo(f"Turtle Moving to x:{args['goal_x']} y:{args['goal_y']} theta:{args['goal_theta']}")
-		angle = math.atan2(args['goal_y'] - self.pose.y, args['goal_x'] - self.pose.x) - self.pose.theta
-		self.rotateByTheta({ 'theta': angle, 'direction': 'clockwise' })
-		distance = math.sqrt(math.pow(args['goal_x'] - self.pose.x, 2) + math.pow(args['goal_y'] - self.pose.y, 2))
-		self.moveByDistance({ 'distance': distance })
-		angle = args['goal_theta'] - self.pose.theta
-		self.rotateByTheta({ 'theta': angle, 'direction': 'clockwise'})
+		self.anglePID.reset()
+		self.distancePID.reset()
+		self.R = math.sqrt(math.pow(self.pose.x - args['goal_x'] , 2) + math.pow(self.pose.y - args['goal_y'] , 2))
+		self.xim = self.pose.x + self.R*math.cos(self.pose.theta)
+		self.yim = self.pose.y + self.R*math.sin(self.pose.theta)
+
+		self.C = math.sqrt(math.pow(self.xim - args['goal_x'] , 2) + math.pow(self.yim - args['goal_y'] , 2))
+		if self.xim > args['goal_x']:
+			self.alpha = math.acos((2*math.pow(self.R,2) - math.pow(self.C,2))/(2*math.pow(self.R,2)))
+		else:
+			self.alpha = 2*math.pi*math.acos((2*math.pow(self.R,2) - math.pow(self.C,2))/(2*math.pow(self.R,2)))
+
+		while self.R > 0.05 or self.alpha>0.005:
+			self.R = math.sqrt(math.pow(self.pose.x - args['goal_x'] , 2) + math.pow(self.pose.y - args['goal_y'] , 2))
+
+			self.xim = self.pose.x + self.R*math.cos(self.pose.theta)
+			self.yim = self.pose.y + self.R*math.sin(self.pose.theta)
+
+			self.C = math.sqrt(math.pow(self.xim - args['goal_x'] , 2) + math.pow(self.yim - args['goal_y'] , 2))
+			
+			if self.xim > args['goal_x']:
+				self.alpha = math.acos((2*math.pow(self.R,2) - math.pow(self.C,2))/(2*math.pow(self.R,2)))
+			else:
+				self.alpha = 2*math.pi*math.acos((2*math.pow(self.R,2) - math.pow(self.C,2))/(2*math.pow(self.R,2)))
+
+			self.alpha = math.acos((2*math.pow(self.R,2) - math.pow(self.C,2))/(2*math.pow(self.R,2)))
+
+			self.angle_err = self.anglePID.update(self.alpha)
+			self.distance_err = self.distancePID.update(self.R)
+			self.msg.angular.z = self.angle_err
+			self.msg.linear.x = self.distance_err
+
+			self.pub_cmd_vel.publish(self.msg)
+
+		self.msg.linear.x=0
+		self.msg.angular.z=0
+		self.pub_cmd_vel.publish(self.msg)
 		
+		# Angle correction
+		angle_err_final = (float(args['goal_theta']) - self.pose.theta + 2*math.pi)%(2*math.pi)
+		self.rotateByTheta({ 'theta': angle_err_final, 'direction': 'clockwise'})
+
 		
 def main():
     TurtleController()
